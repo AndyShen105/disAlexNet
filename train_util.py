@@ -1,8 +1,3 @@
-"""
-Written by Matteo Dunnhofer - 2017
-
-Helper functions and procedures
-"""
 import os
 import random
 import tensorflow as tf 
