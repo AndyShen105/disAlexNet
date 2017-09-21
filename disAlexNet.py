@@ -86,7 +86,7 @@ elif FLAGS.job_name == "worker":
 	    y_ = tf.placeholder(tf.float32, shape=[None, 1000], name="y-input")
 	
 	#creat an AlexNet
-  	y_conv, _ = alexnet.classifier(x_b, keep_prob)
+  	y_conv, _ = AlexNet(x, 0.5)
 
 	# specify cost function
 	with tf.name_scope('cross_entropy'):
@@ -128,15 +128,15 @@ elif FLAGS.job_name == "worker":
 	epoch_time = time.time()
 	while (not sv.should_stop()):
 	    #Read batch_size data
-	    for e in range(epochs):
+	    for e in range(Epoch):
 		for i in range(num_batches):
 		    #batch_x, batch_y = tu.read_batch(batch_size, train_img_path, wnid_labels)
-                    batch_x, batch_y = tu.read_validation_batch(batch_size, os.path.join(imagenet_path, 'ILSVRC2012_img_val'), os.path.join(imagenet_path, '/ILSVRC2012_validation_ground_truth.txt'))
-                    _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
+                    batch_x, batch_y = tu.read_validation_batch(batch_size, '/home/bo.tang@dbg.private/data/ILSVRC2012/ILSVRC2012_img_val', '/home/bo.tang@dbg.private/data/ILSVRC2012/ILSVRC2012_validation_ground_truth.txt')
+                    _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y})
 	    	    print("Step: %d," % (step+1), 
 			        " Accuracy: %.4f," % final_accuracy,
 			        " Loss: %f" % cost,
-			        " Bctch_Time: %fs" % float(time.time()-begin_time))
+			        " Bctch_Time: %fs" % float(time.time()-batch_time))
 	    	    batch_time = time.time()
 
 	    	print("Epoch: %d," % (e+1), 
