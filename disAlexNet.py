@@ -6,7 +6,7 @@ import sys
 import time
 import os
 from AlexNet import AlexNet
-
+import train_util as tu
 #get the optimizer
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 os.environ['GRPC_VERBOSITY_LEVEL']='DEBUG'
@@ -39,10 +39,10 @@ tf.app.flags.DEFINE_string("job_name", "", "Either 'ps' or 'worker'")
 tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 tf.app.flags.DEFINE_float("targted_accuracy", 0.5, "targted accuracy of model")
 tf.app.flags.DEFINE_string("optimizer", "SGD", "optimizer we adopted")
-tf.app.flags.DEFINE_interger("Batch_size", 128, "Batch size")
+tf.app.flags.DEFINE_integer("Batch_size", 128, "Batch size")
 tf.app.flags.DEFINE_float("Learning_rate", 0.0001, "Learning rate")
-tf.app.flags.DEFINE_interger("Epoch", 10, "Epoch")
-tf.app.flags.DEFINE_interger("imagenet_path", 10, "ImageNet data path")
+tf.app.flags.DEFINE_integer("Epoch", 10, "Epoch")
+tf.app.flags.DEFINE_integer("imagenet_path", 10, "ImageNet data path")
 FLAGS = tf.app.flags.FLAGS
 
 # start a server for a specific task
