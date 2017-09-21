@@ -133,11 +133,6 @@ elif FLAGS.job_name == "worker":
 		    #batch_x, batch_y = tu.read_batch(batch_size, train_img_path, wnid_labels)
                     batch_x, batch_y = tu.read_validation_batch(batch_size, os.path.join(imagenet_path, 'ILSVRC2012_img_val'), os.path.join(imagenet_path, '/ILSVRC2012_validation_ground_truth.txt'))
                     _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
-		        '''
-		        final_accuracy = sess.run(accuracy, feed_dict = {x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
-		        if (final_accuracy > targted_accuracy):
-	    	    	break
-		        '''
 	    	    print("Step: %d," % (step+1), 
 			        " Accuracy: %.4f," % final_accuracy,
 			        " Loss: %f" % cost,
