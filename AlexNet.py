@@ -1,8 +1,3 @@
-"""
-Written by Matteo Dunnhofer - 2017
-
-Definition of AlexNet architecture
-"""
 
 import tensorflow as tf
 import train_util as tu
