@@ -6,7 +6,6 @@ import sys
 import time
 import os
 from AlexNet import AlexNet
-from tensorflow.examples.tutorials.mnist import input_data
 
 #get the optimizer
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
@@ -42,6 +41,7 @@ tf.app.flags.DEFINE_float("targted_accuracy", 0.5, "targted accuracy of model")
 tf.app.flags.DEFINE_string("optimizer", "SGD", "optimizer we adopted")
 tf.app.flags.DEFINE_interger("Batch_size", 128, "Batch size")
 tf.app.flags.DEFINE_float("Learning_rate", 0.0001, "Learning rate")
+tf.app.flags.DEFINE_interger("Epoch", 10, "Epoch")
 FLAGS = tf.app.flags.FLAGS
 
 # start a server for a specific task
@@ -55,7 +55,7 @@ batch_size = FLAGS.Batch_size
 learning_rate = FLAGS.Learning_rate
 targted_accuracy = FLAGS.targted_accuracy
 Optimizer = FLAGS.optimizer
-
+Epoch = FLAGS.Epoch
 
 if FLAGS.job_name == "ps":
     server.join()
@@ -117,28 +117,38 @@ elif FLAGS.job_name == "worker":
             uninitalized_variables=sess.run(variables_check_op)
 	    if(len(uninitalized_variables.shape) == 1):
 		state = True
-	start_time = time.time()
+	
 	step = 0
 	cost = 0
 	final_accuracy = 0
-	begin_time = time.time()
-	while (not sv.should_stop()) and (step < 550):
+	start_time = time.time()
+	batch_time = time.time()
+	epoch_time = time.time()
+	while (not sv.should_stop()):
 	    #Read batch_size data
-	    batch_x, batch_y = tu.read_batch(batch_size, train_img_path, wnid_labels)
-	    _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
-
-	    final_accuracy = sess.run(accuracy, feed_dict = {x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
-	    if (final_accuracy > targted_accuracy):
-	    	break
-	    print("Step: %d," % (step+1), 
+	    for e in range(epochs):
+		for i in range(num_batches):
+		    batch_x, batch_y = tu.read_batch(batch_size, train_img_path, wnid_labels)
+		    _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
+		    '''
+		    final_accuracy = sess.run(accuracy, feed_dict = {x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
+		    if (final_accuracy > targted_accuracy):
+	    	    	break
+		    '''
+	    	    print("Step: %d," % (step+1), 
 			" Accuracy: %.4f," % final_accuracy,
 			" Loss: %f" % cost,
-			" Time: %fs" % float(time.time()-begin_time))
-	    begin_time = time.time()
-	    
-	#index, sum_step, total_time, cost, final_accuracy
-	    
-	final_accuracy = sess.run(accuracy, feed_dict = {x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
+			" Bctch_Time: %fs" % float(time.time()-begin_time))
+	    	    batch_time = time.time()
+
+	    	print("Epoch: %d," % (e+1), 
+			" Accuracy: %.4f," % final_accuracy,
+			" Loss: %f" % cost,
+			" Epoch_Time: %fs" % float(time.time()-epoch_time),
+			" Tolal_Time: %fs" % float(time.time()-start_time))
+		
+	#index, sum_step, total_time, cost, final_accuracy    
+	#final_accuracy = sess.run(accuracy, feed_dict = {x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
 	re = str(n_PS) + '-' + str(n_Workers) + '-' + str(FLAGS.task_index) + ',' + str(step) + ',' + str(float(time.time()-start_time)) + ',' + str(cost) + ',' + str(final_accuracy)
         writer = open("re_2_"+Optimizer+".csv", "a+")
         writer.write(re+"\r\n")
