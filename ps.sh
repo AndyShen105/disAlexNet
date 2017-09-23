@@ -46,21 +46,21 @@ do
     if [ $i == 42 ]
     then
 	source /root/anaconda2/envs/tensorflow/bin/activate
-        python /root/code/disDNN/disDNN.py $ps $worker --job_name=ps --task_index=0
+        python /root/code/disAlexNet/disAleNt.py $ps $worker --job_name=ps --task_index=0
     else
 	ssh ssd$i "source activate tensorflow"
         n=`expr 42 - $1`
         if [ $i -gt $n ]
         then
             index=`expr 42 - $i`
-            ssh ssd$i python /root/code/disDNN/disDNN.py $ps $worker --job_name=ps --task_index=$index
+            ssh ssd$i python /root/code/disAlexNet/disAleNt.py $ps $worker --job_name=ps --task_index=$index
         else
             index=`expr 42 - $1 - $i`
 	    if [ $index != 0 ]
 	    then
 		sleep 0.5
 	    fi
-	    ssh ssd$i python /root/code/disDNN/disDNN.py $ps $worker --job_name=worker --task_index=$index --targted_accuracy=$4 --empoch=$6 --optimizer=$3 >> /root/code/$index".temp"
+	    ssh ssd$i python /root/code/disAlexNet/disAleNt.py $ps $worker --job_name=worker --task_index=$index --targted_accuracy=$4 --empoch=$6 --optimizer=$3 >> /root/code/$index".temp"
             echo "worker"$index" complated"
 	    echo "1">temp$index
 	fi
