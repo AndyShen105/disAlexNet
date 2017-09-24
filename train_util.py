@@ -131,88 +131,7 @@ def preprocess_image(image_path):
 
 	for i in range(3):
 		cropped_im_array[:,:,i] -= IMAGENET_MEAN[i]
-
-	#for i in range(3):
-	#	mean = np.mean(img_c1_np[:,:,i])
-	#	stddev = np.std(img_c1_np[:,:,i])
-	#	img_c1_np[:,:,i] -= mean
-	#	img_c1_np[:,:,i] /= stddev
-
 	return cropped_im_array
-
-
-""" it reads a batch of images performing some data augmentation 
-def read_batch_da(batch_size, im_source, labels):
-	batch_im = []
-	batch_cls = []
-
-	for i in range(int(float(batch_size) / 4)):
-		rand = random.randint(0, 999)
-
-		folder = labels[rand]
-		batch_im += read_image_da(os.path.join(im_source, folder))
-
-		batch_l = []
-		for j in range(4):
-			batch_l.append(onehot(rand))
-		batch_cls += batch_l
-
-	np.vstack(batch_im)
-	np.vstack(batch_cls)
-	return batch_im, batch_cls
-"""
-
-""" it reads an image and performs some data augmentation on it
-	resize the smallest edge to 256 px and take two random 224x224 patches 
-	(with their vertical flip) from it
-	so, from one image it will create four
-def read_image_da(im_folder):
-	batch = []
-
-	im_path = os.path.join(im_folder, random.choice(os.listdir(im_folder)))
-	img = Image.open(im_path).convert('RGB')
-
-	if img.size[0] < img.size[1]:
-		h = int(float(256 * img.size[1]) / img.size[0])
-		img = img.resize((256, h), Image.ANTIALIAS)
-	else:
-		w = int(float(256 * img.size[0]) / img.size[1])
-		img = img.resize((w, 256), Image.ANTIALIAS)
-
-	x = random.randint(0, img.size[0] - 224)
-	y = random.randint(0, img.size[1] - 224)
-	img_c1 = img.crop((x, y, x + 224, y + 224))
-	img_c1_np = np.array(img_c1, dtype=np.float32)
-	img_c1_np[:,:,0] -= VGG_MEAN[2]
-	img_c1_np[:,:,1] -= VGG_MEAN[1]
-	img_c1_np[:,:,2] -= VGG_MEAN[0]
-	
-	img_f1 = img_c1.transpose(Image.FLIP_LEFT_RIGHT)
-	img_f1_np = np.array(img_f1, dtype=np.float32)
-	img_f1_np[:,:,0] -= VGG_MEAN[2]
-	img_f1_np[:,:,1] -= VGG_MEAN[1]
-	img_f1_np[:,:,2] -= VGG_MEAN[0]
-	batch.append(img_c1_np)
-	batch.append(img_f1_np)
-
-	x = random.randint(0, img.size[0] - 224)
-	y = random.randint(0, img.size[1] - 224)
-	img_c2 = img.crop((x, y, x + 224, y + 224))
-	img_c2_np = np.array(img_c2, dtype=np.float32)
-	img_c2_np[:,:,0] -= VGG_MEAN[2]
-	img_c2_np[:,:,1] -= VGG_MEAN[1]
-	img_c2_np[:,:,2] -= VGG_MEAN[0]
-	
-	img_f2 = img_c2.transpose(Image.FLIP_LEFT_RIGHT)
-	img_f2_np = np.array(img_f2, dtype=np.float32)
-	img_f2_np[:,:,0] -= VGG_MEAN[2]
-	img_f2_np[:,:,1] -= VGG_MEAN[1]
-	img_f2_np[:,:,2] -= VGG_MEAN[0]
-	batch.append(img_c2_np)
-	batch.append(img_f2_np)
-
-	return batch
-"""
 
 def read_k_patches(image_path, k):
 	""" It reads k random crops from an image
@@ -292,13 +211,10 @@ def load_imagenet_meta(meta_path):
 			words: list of words (as strings) referring to wnids labels and describing the classes 
 
 	"""
-	metadata = loadmat(meta_path, struct_as_record=False)
-	
-	# ['ILSVRC2012_ID', 'WNID', 'words', 'gloss', 'num_children', 'children', 'wordnet_height', 'num_train_images']
-	synsets = np.squeeze(metadata['synsets'])
-	ids = np.squeeze(np.array([s.ILSVRC2012_ID for s in synsets]))
-	wnids = np.squeeze(np.array([s.WNID for s in synsets]))
-	words = np.squeeze(np.array([s.words for s in synsets]))
+	meta_file = open("code/disAlexDNN/ImageNet_synset_words.txt", "r")
+	meta_data = meta_file.readlines()
+	wnids = np.squeeze(np.array([s.split(",")[0] for s in meta_data]))
+	words = np.squeeze(np.array([s.split(",")[1] for s in meta_data]))
 	return wnids, words
 
 def read_test_labels(annotations_path):
