@@ -76,7 +76,7 @@ elif FLAGS.job_name == "worker":
 	train_img_path = "/root/data/ILSVRC/Data/CLS-LOC/train/"
 	ts_size = tu.imagenet_size("/root/data/ILSVRC/Data/CLS-LOC/train/")
 	num_batches = int(float(ts_size) / batch_size)
-	wnid_labels, _ = tu.load_imagenet_meta('/root/code/disAlexNet/meta_data.txt')
+	wnid_labels = tu.load_imagenet_meta('/root/code/disAlexNet/meta_data.txt')
 	#-----------------------------------TUDO Check data input-------------------------------------------------#
 	
 	# input images
