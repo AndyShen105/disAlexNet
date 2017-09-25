@@ -211,11 +211,11 @@ def load_imagenet_meta(meta_path):
 			words: list of words (as strings) referring to wnids labels and describing the classes 
 
 	"""
-	meta_file = open("code/disAlexDNN/ImageNet_synset_words.txt", "r")
-	#meta_data = meta_file.readlines()
+	meta_file = open(meta_path, "r")
+	meta_data = meta_file.readlines()
 	wnids = np.squeeze(np.array([s.strip() for s in meta_data]))
 	#words = np.squeeze(np.array([s.split(",")[1] for s in meta_data]))
-	return wnids, words
+	return wnids
 
 def read_test_labels(annotations_path):
 	""" It reads groundthruth labels from ILSRVC 2012 annotations file
