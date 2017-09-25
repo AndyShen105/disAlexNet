@@ -72,10 +72,11 @@ elif FLAGS.job_name == "worker":
 	global_step = tf.get_variable('global_step',[],initializer = tf.constant_initializer(0),trainable = False)
 
 	# load ImageNet-1k data set
-	train_img_path = os.path.join(imagenet_path, 'ILSVRC2012_img_train')
-	ts_size = tu.imagenet_size(train_img_path)
+	#train_img_path = os.path.join(imagenet_path, 'train')
+	train_img_path = "/root/data/ILSVRC/Data/CLS-LOC/train/"
+	ts_size = tu.imagenet_size("/root/data/ILSVRC/Data/CLS-LOC/train/")
 	num_batches = int(float(ts_size) / batch_size)
-	wnid_labels, _ = tu.load_imagenet_meta(os.path.join(imagenet_path, 'data/meta.mat'))
+	wnid_labels, _ = tu.load_imagenet_meta('/root/code/disAlexNet/meta_data.txt')
 	#-----------------------------------TUDO Check data input-------------------------------------------------#
 	
 	# input images
@@ -86,7 +87,8 @@ elif FLAGS.job_name == "worker":
 	    y_ = tf.placeholder(tf.float32, shape=[None, 1000], name="y-input")
 	
 	#creat an AlexNet
-  	y_conv, _ = AlexNet(x, 0.5)
+	keep_prob = tf.placeholder(tf.float32)
+  	y_conv, _ = AlexNet(x, keep_prob)
 
 	# specify cost function
 	with tf.name_scope('cross_entropy'):
@@ -131,9 +133,10 @@ elif FLAGS.job_name == "worker":
 	    for e in range(Epoch):
 		for i in range(num_batches):
 		    batch_x, batch_y = tu.read_batch(batch_size, train_img_path, wnid_labels)
-                    #batch_x, batch_y = tu.read_validation_batch(batch_size, '/home/bo.tang@dbg.private/data/ILSVRC2012/ILSVRC2012_img_val', '/home/bo.tang@dbg.private/data/ILSVRC2012/ILSVRC2012_validation_ground_truth.txt')
-                    _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y})
-	    	    print("Step: %d," % (step+1), 
+                    _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
+	    	    val_x, val_y = tu.read_validation_batch(batch_size, '/root/data/ILSVRC/Data/CLS-LOC/val/', '/root/code/disAlexNet/ILSVRC2012_validation_ground_truth.txt')
+		    final_accuracy = sess.run(accuracy, feed_dict = {x: val_x, y_: val_y, keep_prob: 1.0})
+		    print("Step: %d," % (step+1), 
 			        " Accuracy: %.4f," % final_accuracy,
 			        " Loss: %f" % cost,
 			        " Bctch_Time: %fs" % float(time.time()-batch_time))
@@ -145,8 +148,8 @@ elif FLAGS.job_name == "worker":
 			" Epoch_Time: %fs" % float(time.time()-epoch_time),
 			" Tolal_Time: %fs" % float(time.time()-start_time))
 		
-	#index, sum_step, total_time, cost, final_accuracy    
-	final_accuracy = sess.run(accuracy, feed_dict = {x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
+	#index, sum_step, total_time, cost, final_accuracy
+	
 	re = str(n_PS) + '-' + str(n_Workers) + '-' + str(FLAGS.task_index) + ',' + str(step) + ',' + str(float(time.time()-start_time)) + ',' + str(cost) + ',' + str(final_accuracy)
         writer = open("re_2_"+Optimizer+".csv", "a+")
 	writer.write(re+"\r\n")
