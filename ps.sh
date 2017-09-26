@@ -5,6 +5,7 @@
 # $4 is the targted_accuracy of model
 # $5 is the tensorflow port
 # $6 is the empoch
+# $7 batch size
 # ps.sh run in ssd42
 
 get_ps_conf(){
@@ -60,7 +61,7 @@ do
 	    then
 		sleep 0.5
 	    fi
-	    ssh ssd$i python /root/code/disAlexNet/disAlexNet.py $ps $worker --job_name=worker --task_index=$index --targted_accuracy=$4 --empoch=$6 --optimizer=$3 >> /root/code/$index".temp"
+	    ssh ssd$i python /root/code/disAlexNet/disAlexNet.py $ps $worker --job_name=worker --task_index=$index --targted_accuracy=$4 --empoch=$6 --optimizer=$3 --Batch_size=$7 >> /root/code/$index".temp"
             echo "worker"$index" complated"
 	    echo "1">temp$index
 	fi

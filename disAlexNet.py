@@ -40,7 +40,7 @@ tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 tf.app.flags.DEFINE_float("targted_accuracy", 0.5, "targted accuracy of model")
 tf.app.flags.DEFINE_string("optimizer", "SGD", "optimizer we adopted")
 tf.app.flags.DEFINE_integer("Batch_size", 128, "Batch size")
-tf.app.flags.DEFINE_float("Learning_rate", 0.0001, "Learning rate")
+tf.app.flags.DEFINE_float("Learning_rate", 0.01, "Learning rate")
 tf.app.flags.DEFINE_integer("Epoch", 10, "Epoch")
 tf.app.flags.DEFINE_string("imagenet_path", 10, "ImageNet data path")
 FLAGS = tf.app.flags.FLAGS
