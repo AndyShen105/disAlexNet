@@ -70,7 +70,7 @@ def read_batch(batch_size, images_source, wnid_labels):
 	for i in range(batch_size):
 		# random class choice 
 		# (randomly choose a folder of image of the same class from a list of previously sorted wnids)
-		class_index = random.randint(0, 10)
+		class_index = random.randint(0, 9)
 
 		folder = wnid_labels[class_index]
 		batch_images.append(read_image(os.path.join(images_source, folder)))
@@ -198,28 +198,22 @@ def read_validation_batch(batch_size, validation_source, annotations):
 	np.vstack(batch_labels_val)
 	return batch_images_val, batch_labels_val
 
-def read_validation_batch(n_val, validation_source, annotations):
+def read_validation_batch_V2(n_val, validation_source, annotations):
 	batch_images_val = []
 	batch_labels_val = []
 
-	images_val = sorted(os.listdir(validation_source))
 
 	# reading groundthruths labels
-	with open(annotations) as f:
-		gt_idxs = f.readlines()
-		gt_idxs = [(int(x.strip()) - 1) for x in gt_idxs]
-
-	for i in range(n_val):
-		# random image choice
-		idx = random.randint(0, len(images_val) - 1)
-
-		image = images_val[idx]
-		if gt_idxs[idx]<10:
-		    batch_images_val.append(preprocess_image(os.path.join(validation_source, image)))
-		    batch_labels_val.append(onehot(gt_idxs[idx]))
-
-	np.vstack(batch_images_val)
-	np.vstack(batch_labels_val)
+	f=open(annotations)
+	for item in f.readlines():
+	    pic = item.split(",")[1].strip()
+	    while len(pic) < 5:
+		pic ="0"+ pic
+	    idx = item.split(",")[0]
+	    batch_images_val.append(preprocess_image("/root/data/ILSVRC/Data/CLS-LOC/val/ILSVRC2012_val_000"+pic+".JPEG"))
+	    batch_labels_val.append(onehot(int(idx)-1))
+	    np.vstack(batch_images_val)
+ 	    np.vstack(batch_labels_val)
 	return batch_images_val, batch_labels_val
 
 ################ Other helper procedures #####################

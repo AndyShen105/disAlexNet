@@ -40,7 +40,7 @@ tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 tf.app.flags.DEFINE_float("targted_accuracy", 0.5, "targted accuracy of model")
 tf.app.flags.DEFINE_string("optimizer", "SGD", "optimizer we adopted")
 tf.app.flags.DEFINE_integer("Batch_size", 128, "Batch size")
-tf.app.flags.DEFINE_float("Learning_rate", 0.01, "Learning rate")
+tf.app.flags.DEFINE_float("Learning_rate", 0.0001, "Learning rate")
 tf.app.flags.DEFINE_integer("Epoch", 10, "Epoch")
 tf.app.flags.DEFINE_string("imagenet_path", 10, "ImageNet data path")
 FLAGS = tf.app.flags.FLAGS
@@ -84,7 +84,7 @@ elif FLAGS.job_name == "worker":
 	    # None -> batch size can be any size, [224, 224, 3] -> image
 	    x = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="x-input")
 	    # target 10 output classes
-	    y_ = tf.placeholder(tf.float32, shape=[None, 1000], name="y-input")
+	    y_ = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
 	
 	#creat an AlexNet
 	keep_prob = tf.placeholder(tf.float32)
@@ -130,18 +130,21 @@ elif FLAGS.job_name == "worker":
 	epoch_time = time.time()
 	while (not sv.should_stop()):
 	    #Read batch_size data
+	    val_x, val_y = tu.read_validation_batch_V2(500, '/root/data/ILSVRC/Data/CLS-LOC/val/', '/root/code/disAlexNet/val_10.txt')
 	    for e in range(Epoch):
 		for i in range(num_batches):
 		    batch_x, batch_y = tu.read_batch(batch_size, train_img_path, wnid_labels)
                     _, cost, step = sess.run([train_op, cross_entropy, global_step], feed_dict={x: batch_x, y_: batch_y, keep_prob: 0.5})
-	    	    val_x, val_y = tu.read_validation_batch(batch_size, '/root/data/ILSVRC/Data/CLS-LOC/val/', '/root/code/disAlexNet/ILSVRC2012_validation_ground_truth.txt')
 		    final_accuracy = sess.run(accuracy, feed_dict = {x: val_x, y_: val_y, keep_prob: 1.0})
 		    print("Step: %d," % (step+1), 
 			        " Accuracy: %.4f," % final_accuracy,
 			        " Loss: %f" % cost,
 			        " Bctch_Time: %fs" % float(time.time()-batch_time))
 	    	    batch_time = time.time()
-
+		    re = str(step+1)+","+str(final_accuracy)+","+str(float(time.time()-batch_time))+","+str(cost)
+		    save = open("test.csv", "a+")
+		    save.write(re+"\r\n")
+		    save.close()
 	    	print("Epoch: %d," % (e+1), 
 			" Accuracy: %.4f," % final_accuracy,
 			" Loss: %f" % cost,

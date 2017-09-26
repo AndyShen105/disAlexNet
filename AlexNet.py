@@ -94,8 +94,8 @@ def AlexNet(x, dropout):
 			fc2 = tf.nn.dropout(fc2, dropout)
 
 		with tf.name_scope('alexnet_classifier_output') as inner_scope:
-			wfc3 = tu.weight([4096, 1000], name='wfc3')
-			bfc3 = tu.bias(0.0, [1000], name='bfc3')
+			wfc3 = tu.weight([4096, 10], name='wfc3')
+			bfc3 = tu.bias(0.0, [10], name='bfc3')
 			fc3 = tf.add(tf.matmul(fc2, wfc3), bfc3)
 			softmax = tf.nn.softmax(fc3)
 
