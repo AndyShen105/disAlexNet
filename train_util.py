@@ -40,7 +40,7 @@ def onehot(index):
 	""" It creates a one-hot vector with a 1.0 in
 		position represented by index 
 	"""
-	onehot = np.zeros(1000)
+	onehot = np.zeros(10)
 	onehot[index] = 1.0
 	return onehot
 
@@ -70,7 +70,7 @@ def read_batch(batch_size, images_source, wnid_labels):
 	for i in range(batch_size):
 		# random class choice 
 		# (randomly choose a folder of image of the same class from a list of previously sorted wnids)
-		class_index = random.randint(0, 999)
+		class_index = random.randint(0, 10)
 
 		folder = wnid_labels[class_index]
 		batch_images.append(read_image(os.path.join(images_source, folder)))
@@ -193,6 +193,30 @@ def read_validation_batch(batch_size, validation_source, annotations):
 		image = images_val[idx]
 		batch_images_val.append(preprocess_image(os.path.join(validation_source, image)))
 		batch_labels_val.append(onehot(gt_idxs[idx]))
+
+	np.vstack(batch_images_val)
+	np.vstack(batch_labels_val)
+	return batch_images_val, batch_labels_val
+
+def read_validation_batch(n_val, validation_source, annotations):
+	batch_images_val = []
+	batch_labels_val = []
+
+	images_val = sorted(os.listdir(validation_source))
+
+	# reading groundthruths labels
+	with open(annotations) as f:
+		gt_idxs = f.readlines()
+		gt_idxs = [(int(x.strip()) - 1) for x in gt_idxs]
+
+	for i in range(n_val):
+		# random image choice
+		idx = random.randint(0, len(images_val) - 1)
+
+		image = images_val[idx]
+		if gt_idxs[idx]<10:
+		    batch_images_val.append(preprocess_image(os.path.join(validation_source, image)))
+		    batch_labels_val.append(onehot(gt_idxs[idx]))
 
 	np.vstack(batch_images_val)
 	np.vstack(batch_labels_val)
