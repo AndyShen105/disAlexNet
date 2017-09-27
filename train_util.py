@@ -209,7 +209,7 @@ def read_validation_batch_V2(n_val, validation_source, annotations):
 	    pic = item.split(",")[1].strip()
 	    while len(pic) < 5:
 		pic ="0"+ pic
-	    idx = item.split(",")[0]
+	    idx = item.split(",")[2]
 	    batch_images_val.append(preprocess_image("/root/data/ILSVRC/Data/CLS-LOC/val/ILSVRC2012_val_000"+pic+".JPEG"))
 	    batch_labels_val.append(onehot(int(idx)-1))
 	    np.vstack(batch_images_val)
